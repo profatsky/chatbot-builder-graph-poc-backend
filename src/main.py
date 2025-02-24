@@ -3,8 +3,10 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from src.core import settings
+from src.core.router import get_app_router
 
 app = FastAPI(title='Chatbot Builder PoC')
+app.include_router(get_app_router())
 
 origins = [
     settings.CLIENT_APP_URL,
