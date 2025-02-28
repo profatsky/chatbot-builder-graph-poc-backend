@@ -1,6 +1,7 @@
 from fastapi import APIRouter
 
 from src.projects.api import router as projects_router
+from src.algo.api import router as algo_router
 
 
 def get_app_router() -> APIRouter:
@@ -8,6 +9,7 @@ def get_app_router() -> APIRouter:
 
     routers = [
         projects_router,
+        algo_router,
     ]
 
     for router in routers:

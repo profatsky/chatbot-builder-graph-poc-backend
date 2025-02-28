@@ -14,8 +14,7 @@ class ProjectService:
         return await self._project_repository.get_projects()
 
     async def delete_project(self, project_id: int):
-        project = self._project_repository.get_project(project_id)
+        project = await self._project_repository.get_project(project_id)
         if project is None:
             raise ProjectNotFoundError
-
         await self._project_repository.delete_project(project_id)

@@ -9,6 +9,7 @@ from alembic import context
 
 from src.core.db import get_postgres_dsn, Base
 from src.projects.models import *
+from src.algo.models import *
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

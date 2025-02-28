@@ -1,3 +1,5 @@
+from uuid import UUID
+
 from fastapi import APIRouter, status
 
 from src.projects.dependencies.services_dependencies import ProjectServiceDI
@@ -36,7 +38,7 @@ async def get_projects(
 )
 async def delete_project(
         project_service: ProjectServiceDI,
-        project_id: int,
+        project_id: UUID,
 ):
     try:
         await project_service.delete_project(project_id)
