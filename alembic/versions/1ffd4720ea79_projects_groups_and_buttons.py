@@ -1,8 +1,8 @@
-"""projects and groups
+"""projects, groups and buttons
 
-Revision ID: 0257b6ef356a
+Revision ID: 1ffd4720ea79
 Revises: 
-Create Date: 2025-02-28 11:48:53.285520
+Create Date: 2025-02-28 14:14:25.111984
 
 """
 from typing import Sequence, Union
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = '0257b6ef356a'
+revision: str = '1ffd4720ea79'
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -38,9 +38,10 @@ def upgrade() -> None:
     sa.Column('button_id', sa.Uuid(), server_default=sa.text('gen_random_uuid()'), nullable=False),
     sa.Column('text', sa.String(length=64), nullable=False),
     sa.Column('payload', sa.String(length=64), nullable=False),
+    sa.Column('sequence_number', sa.Integer(), nullable=False),
     sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
     sa.Column('group_id', sa.Uuid(), nullable=False),
-    sa.Column('destination_group_id', sa.Uuid(), nullable=False),
+    sa.Column('destination_group_id', sa.Uuid(), nullable=True),
     sa.ForeignKeyConstraint(['destination_group_id'], ['groups.group_id'], ondelete='SET NULL'),
     sa.ForeignKeyConstraint(['group_id'], ['groups.group_id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('button_id')
@@ -49,7 +50,7 @@ def upgrade() -> None:
     sa.Column('input_id', sa.Uuid(), server_default=sa.text('gen_random_uuid()'), nullable=False),
     sa.Column('type', sa.Enum('INT', 'EMAIL', 'PHONE_NUMBER', 'ANY', name='inputtype'), nullable=False),
     sa.Column('group_id', sa.Uuid(), nullable=False),
-    sa.Column('destination_group_id', sa.Uuid(), nullable=False),
+    sa.Column('destination_group_id', sa.Uuid(), nullable=True),
     sa.ForeignKeyConstraint(['destination_group_id'], ['groups.group_id'], ondelete='SET NULL'),
     sa.ForeignKeyConstraint(['group_id'], ['groups.group_id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('input_id')
@@ -63,5 +64,4 @@ def downgrade() -> None:
     op.drop_table('buttons')
     op.drop_table('groups')
     op.drop_table('projects')
-    op.execute('DROP TYPE inputtype;')
     # ### end Alembic commands ###

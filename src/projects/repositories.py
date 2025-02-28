@@ -15,23 +15,24 @@ class ProjectRepository:
         project = ProjectModel(**project.model_dump())
         self._session.add(project)
         await self._session.commit()
-        project = await self.get_project(project.project_id)
-        return project
+        return ProjectReadSchema.model_validate(project)
 
     async def get_projects(self) -> list[ProjectReadSchema]:
         projects = await self._session.execute(
             select(ProjectModel)
         )
-        projects = projects.unique().scalars().all()
-        return [ProjectReadSchema.model_validate(project) for project in projects]
+        return [
+            ProjectReadSchema.model_validate(project)
+            for project in projects.unique().scalars().all()
+        ]
 
-    async def get_project(self, project_id: int) -> Optional[ProjectReadSchema]:
+    async def get_project_by_id(self, project_id: int) -> Optional[ProjectReadSchema]:
         project = await self._session.execute(
             select(ProjectModel)
             .where(ProjectModel.project_id == project_id)
         )
         project = project.scalar()
-        if not project:
+        if project is None:
             return
         return ProjectReadSchema.model_validate(project)
 

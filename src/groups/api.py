@@ -2,22 +2,26 @@ from uuid import UUID
 
 from fastapi import APIRouter, status
 
-from src.algo.dependencies.services_dependencies import AlgoServiceDI
-from src.algo.exceptions.http_exceptions import GroupNotFoundHTTPException
-from src.algo.exceptions.services_exceptions import GroupNotFoundError
-from src.algo.schemas import GroupReadSchema, GroupCreateSchema
+from src.groups.dependencies.services_dependencies import GroupServiceDI
+from src.groups.exceptions.http_exceptions import GroupNotFoundHTTPException
+from src.groups.exceptions.services_exceptions import GroupNotFoundError
+from src.groups.schemas import GroupReadSchema, GroupCreateSchema
 from src.projects.exceptions.http_exceptions import ProjectNotFoundHTTPException
 from src.projects.exceptions.services_exceptions import ProjectNotFoundError
 
-router = APIRouter(prefix='/projects/{project_id}', tags=['Algo'])
+router = APIRouter(
+    prefix='/projects/{project_id}/groups',
+    tags=['Groups'],
+)
 
 
 @router.post(
-    '/groups',
+    '',
     response_model=GroupReadSchema,
+    status_code=status.HTTP_201_CREATED,
 )
 async def create_group(
-        algo_service: AlgoServiceDI,
+        algo_service: GroupServiceDI,
         project_id: UUID,
         group: GroupCreateSchema,
 ):
@@ -31,11 +35,11 @@ async def create_group(
 
 
 @router.get(
-    '/groups',
+    '',
     response_model=list[GroupReadSchema],
 )
 async def get_groups(
-        algo_service: AlgoServiceDI,
+        algo_service: GroupServiceDI,
         project_id: UUID,
 ):
     try:
@@ -45,11 +49,11 @@ async def get_groups(
 
 
 @router.delete(
-    '/groups/{group_id}',
+    '/{group_id}',
     status_code=status.HTTP_204_NO_CONTENT,
 )
 async def delete_group(
-        algo_service: AlgoServiceDI,
+        algo_service: GroupServiceDI,
         project_id: UUID,
         group_id: UUID,
 ):

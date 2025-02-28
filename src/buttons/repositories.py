@@ -1,0 +1,56 @@
+from typing import Optional
+from uuid import UUID
+
+from sqlalchemy import select, func, delete
+
+from src.buttons.models import ButtonModel
+from src.buttons.schemas import ButtonCreateSchema, ButtonReadSchema
+from src.core.dependencies.db_dependencies import AsyncSessionDI
+
+
+class ButtonRepository:
+    def __init__(self, session: AsyncSessionDI):
+        self._session = session
+
+    async def create_button(self, group_id: UUID, button: ButtonCreateSchema) -> Optional[ButtonReadSchema]:
+        button_count = await self._session.scalar(
+            select(func.count())
+            .select_from(ButtonModel)
+            .where(ButtonModel.group_id == group_id)
+        )
+        button = ButtonModel(
+            **button.model_dump(),
+            group_id=group_id,
+            sequence_number=button_count + 1,
+        )
+        self._session.add(button)
+        await self._session.commit()
+        return ButtonReadSchema.model_validate(button)
+
+    async def get_buttons(self, group_id: UUID) -> list[ButtonReadSchema]:
+        buttons = await self._session.execute(
+            select(ButtonModel)
+            .where(ButtonModel.group_id == group_id)
+            .order_by(ButtonModel.sequence_number)
+        )
+        return [
+            ButtonReadSchema.model_validate(button)
+            for button in buttons.scalars().all()
+        ]
+
+    async def get_button_by_id(self, button_id: UUID) -> Optional[ButtonReadSchema]:
+        button = await self._session.execute(
+            select(ButtonModel)
+            .where(ButtonModel.button_id == button_id)
+        )
+        button = button.scalar()
+        if button is None:
+            return
+        return ButtonReadSchema.model_validate(button)
+
+    async def delete_button(self, button_id: UUID):
+        await self._session.execute(
+            delete(ButtonModel)
+            .where(ButtonModel.button_id == button_id)
+        )
+        await self._session.commit()
