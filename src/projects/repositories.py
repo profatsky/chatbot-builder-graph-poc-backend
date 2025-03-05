@@ -39,8 +39,6 @@ class ProjectRepository:
     async def delete_project(self, project_id: int):
         await self._session.execute(
             delete(ProjectModel)
-            .where(
-                ProjectModel.project_id == project_id,
-            )
+            .where(ProjectModel.project_id == project_id)
         )
         await self._session.commit()

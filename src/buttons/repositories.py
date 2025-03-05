@@ -4,7 +4,7 @@ from uuid import UUID
 from sqlalchemy import select, func, delete
 
 from src.buttons.models import ButtonModel
-from src.buttons.schemas import ButtonCreateSchema, ButtonReadSchema
+from src.buttons.schemas import ButtonCreateSchema, ButtonReadSchema, ButtonUpdateSchema
 from src.core.dependencies.db_dependencies import AsyncSessionDI
 
 
@@ -27,7 +27,7 @@ class ButtonRepository:
         await self._session.commit()
         return ButtonReadSchema.model_validate(button)
 
-    async def get_buttons(self, group_id: UUID) -> list[ButtonReadSchema]:
+    async def get_buttons(self, project_id: UUID, group_id: UUID) -> list[ButtonReadSchema]:
         buttons = await self._session.execute(
             select(ButtonModel)
             .where(ButtonModel.group_id == group_id)
@@ -38,19 +38,70 @@ class ButtonRepository:
             for button in buttons.scalars().all()
         ]
 
-    async def get_button_by_id(self, button_id: UUID) -> Optional[ButtonReadSchema]:
+    async def get_button_by_id(self, group_id: UUID, button_id: UUID) -> Optional[ButtonReadSchema]:
         button = await self._session.execute(
             select(ButtonModel)
-            .where(ButtonModel.button_id == button_id)
+            .where(
+                ButtonModel.group_id == group_id,
+                ButtonModel.button_id == button_id,
+            )
         )
         button = button.scalar()
         if button is None:
             return
         return ButtonReadSchema.model_validate(button)
 
-    async def delete_button(self, button_id: UUID):
+    async def delete_button(self, group_id: UUID, button_id: UUID):
         await self._session.execute(
             delete(ButtonModel)
-            .where(ButtonModel.button_id == button_id)
+            .where(
+                ButtonModel.group_id == group_id,
+                ButtonModel.button_id == button_id,
+            )
         )
         await self._session.commit()
+
+    async def set_button_destination_group(
+            self,
+            group_id: UUID,
+            button_id: UUID,
+            destination_group_id: UUID,
+    ) -> Optional[ButtonReadSchema]:
+        button = await self._session.execute(
+            select(ButtonModel)
+            .where(
+                ButtonModel.group_id == group_id,
+                ButtonModel.button_id == button_id,
+            )
+        )
+        button = button.scalar()
+        if button is None:
+            return
+
+        button.destination_group_id = destination_group_id
+        await self._session.commit()
+
+        return ButtonReadSchema.model_validate(button)
+
+    async def update_button(
+            self,
+            group_id: UUID,
+            button_id: UUID,
+            button_update: ButtonUpdateSchema,
+    ) -> Optional[ButtonReadSchema]:
+        button = await self._session.execute(
+            select(ButtonModel)
+            .where(
+                ButtonModel.group_id == group_id,
+                ButtonModel.button_id == button_id,
+            )
+        )
+        button = button.scalar()
+        if button is None:
+            return
+
+        button.text = button_update.text
+        button.payload = button_update.payload
+        await self._session.commit()
+
+        return ButtonReadSchema.model_validate(button)

@@ -21,12 +21,12 @@ router = APIRouter(
     status_code=status.HTTP_201_CREATED,
 )
 async def create_group(
-        algo_service: GroupServiceDI,
+        group_service: GroupServiceDI,
         project_id: UUID,
         group: GroupCreateSchema,
 ):
     try:
-        return await algo_service.create_group(
+        return await group_service.create_group(
             project_id=project_id,
             group=group,
         )
@@ -39,11 +39,11 @@ async def create_group(
     response_model=list[GroupReadSchema],
 )
 async def get_groups(
-        algo_service: GroupServiceDI,
+        group_service: GroupServiceDI,
         project_id: UUID,
 ):
     try:
-        return await algo_service.get_groups(project_id)
+        return await group_service.get_groups(project_id)
     except ProjectNotFoundError:
         raise ProjectNotFoundHTTPException
 
@@ -53,12 +53,12 @@ async def get_groups(
     status_code=status.HTTP_204_NO_CONTENT,
 )
 async def delete_group(
-        algo_service: GroupServiceDI,
+        group_service: GroupServiceDI,
         project_id: UUID,
         group_id: UUID,
 ):
     try:
-        await algo_service.delete_group(
+        await group_service.delete_group(
             project_id=project_id,
             group_id=group_id,
         )

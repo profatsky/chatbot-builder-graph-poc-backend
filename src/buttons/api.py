@@ -1,10 +1,12 @@
+from typing import Annotated
 from uuid import UUID
 
-from fastapi import APIRouter, status
+from fastapi import APIRouter, status, Body
 
 from src.buttons.dependencies.services_dependencies import ButtonServiceDI
+from src.buttons.exceptions.http_exceptions import ButtonNotFoundHTTPException
 from src.buttons.exceptions.services_exceptions import ButtonNotFoundError
-from src.buttons.schemas import ButtonReadSchema, ButtonCreateSchema
+from src.buttons.schemas import ButtonReadSchema, ButtonCreateSchema, ButtonUpdateSchema
 from src.groups.exceptions.http_exceptions import GroupNotFoundHTTPException
 from src.groups.exceptions.services_exceptions import GroupNotFoundError
 from src.projects.exceptions.http_exceptions import ProjectNotFoundHTTPException
@@ -81,3 +83,55 @@ async def delete_button(
         raise GroupNotFoundHTTPException
     except ButtonNotFoundError:
         raise ButtonNotFoundError
+
+
+@router.patch(
+    '/{button_id}/destination',
+    response_model=ButtonReadSchema,
+)
+async def set_button_destination_group(
+        button_service: ButtonServiceDI,
+        project_id: UUID,
+        group_id: UUID,
+        button_id: UUID,
+        destination_group_id: Annotated[UUID, Body(embed=True)],
+):
+    try:
+        return await button_service.set_button_destination_group(
+            project_id=project_id,
+            group_id=group_id,
+            button_id=button_id,
+            destination_group_id=destination_group_id,
+        )
+    except ProjectNotFoundError:
+        raise ProjectNotFoundHTTPException
+    except GroupNotFoundError:
+        raise GroupNotFoundHTTPException
+    except ButtonNotFoundError:
+        raise ButtonNotFoundHTTPException
+
+
+@router.put(
+    '/{button_id}',
+    response_model=ButtonReadSchema,
+)
+async def update_button(
+        button_service: ButtonServiceDI,
+        project_id: UUID,
+        group_id: UUID,
+        button_id: UUID,
+        button_update: ButtonUpdateSchema,
+):
+    try:
+        return await button_service.update_button(
+            project_id=project_id,
+            group_id=group_id,
+            button_id=button_id,
+            button_update=button_update,
+        )
+    except ProjectNotFoundError:
+        raise ProjectNotFoundHTTPException
+    except GroupNotFoundError:
+        raise GroupNotFoundHTTPException
+    except ButtonNotFoundError:
+        raise ButtonNotFoundHTTPException

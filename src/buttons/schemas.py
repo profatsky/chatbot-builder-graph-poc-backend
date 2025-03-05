@@ -21,3 +21,8 @@ class ButtonReadSchema(BaseModel):
 class ButtonCreateSchema(BaseModel):
     text: str = Field(max_length=64)
     payload: str = Field(max_length=64)
+
+
+class ButtonUpdateSchema(BaseModel):
+    text: str = Field(max_length=64)
+    payload: str = Field(max_length=64)
