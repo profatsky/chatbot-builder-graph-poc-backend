@@ -37,6 +37,7 @@ class GroupModel(Base):
     buttons: Mapped[list[ButtonModel]] = relationship(
         back_populates='group',
         foreign_keys='ButtonModel.group_id',
+        lazy='selectin',
     )
     parents_buttons: Mapped[list[ButtonModel]] = relationship(
         back_populates='destination_group',

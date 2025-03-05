@@ -22,6 +22,8 @@ class GroupRepository:
         )
         self._session.add(group)
         await self._session.commit()
+        await self._session.refresh(group)
+
         return GroupReadSchema.model_validate(group)
 
     async def get_groups(self, project_id: UUID) -> list[GroupReadSchema]:
