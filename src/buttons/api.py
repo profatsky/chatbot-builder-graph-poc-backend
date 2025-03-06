@@ -4,9 +4,19 @@ from uuid import UUID
 from fastapi import APIRouter, status, Body
 
 from src.buttons.dependencies.services_dependencies import ButtonServiceDI
-from src.buttons.exceptions.http_exceptions import ButtonNotFoundHTTPException
-from src.buttons.exceptions.services_exceptions import ButtonNotFoundError
-from src.buttons.schemas import ButtonReadSchema, ButtonCreateSchema, ButtonUpdateSchema
+from src.buttons.exceptions.http_exceptions import (
+    ButtonNotFoundHTTPException,
+    ButtonIdsMismatchHTTPException,
+    IncorrectButtonSeqNumbersHTTPException,
+    IncorrectNumberOfButtonsHTTPException,
+)
+from src.buttons.exceptions.services_exceptions import (
+    ButtonNotFoundError,
+    ButtonIdsMismatchError,
+    IncorrectButtonSeqNumbersError,
+    IncorrectNumberOfButtonsError,
+)
+from src.buttons.schemas import ButtonReadSchema, ButtonCreateSchema, ButtonUpdateSchema, ButtonIdWithSeqNumber
 from src.groups.exceptions.http_exceptions import GroupNotFoundHTTPException
 from src.groups.exceptions.services_exceptions import GroupNotFoundError
 from src.projects.exceptions.http_exceptions import ProjectNotFoundHTTPException
@@ -135,3 +145,31 @@ async def update_button(
         raise GroupNotFoundHTTPException
     except ButtonNotFoundError:
         raise ButtonNotFoundHTTPException
+
+
+@router.post(
+    '/sequence',
+    response_model=list[ButtonIdWithSeqNumber],
+)
+async def change_button_sequence(
+        button_service: ButtonServiceDI,
+        project_id: UUID,
+        group_id: UUID,
+        button_ids_with_seq_numbers: list[ButtonIdWithSeqNumber],
+):
+    try:
+        return await button_service.change_button_sequence(
+            project_id=project_id,
+            group_id=group_id,
+            button_ids_with_seq_numbers=button_ids_with_seq_numbers,
+        )
+    except ProjectNotFoundError:
+        raise ProjectNotFoundHTTPException
+    except GroupNotFoundError:
+        raise GroupNotFoundHTTPException
+    except IncorrectNumberOfButtonsError:
+        raise IncorrectNumberOfButtonsHTTPException
+    except ButtonIdsMismatchError:
+        raise ButtonIdsMismatchHTTPException
+    except IncorrectButtonSeqNumbersError:
+        raise IncorrectButtonSeqNumbersHTTPException

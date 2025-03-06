@@ -26,3 +26,12 @@ class ButtonCreateSchema(BaseModel):
 class ButtonUpdateSchema(BaseModel):
     text: str = Field(max_length=64)
     payload: str = Field(max_length=64)
+
+
+class ButtonIdWithSeqNumber(BaseModel):
+    button_id: UUID
+    sequence_number: int
+
+    model_config = {
+        'from_attributes': True,
+    }

@@ -4,7 +4,7 @@ from uuid import UUID
 from sqlalchemy import select, func, delete
 
 from src.buttons.models import ButtonModel
-from src.buttons.schemas import ButtonCreateSchema, ButtonReadSchema, ButtonUpdateSchema
+from src.buttons.schemas import ButtonCreateSchema, ButtonReadSchema, ButtonUpdateSchema, ButtonIdWithSeqNumber
 from src.core.dependencies.db_dependencies import AsyncSessionDI
 
 
@@ -27,7 +27,7 @@ class ButtonRepository:
         await self._session.commit()
         return ButtonReadSchema.model_validate(button)
 
-    async def get_buttons(self, project_id: UUID, group_id: UUID) -> list[ButtonReadSchema]:
+    async def get_buttons(self, group_id: UUID) -> list[ButtonReadSchema]:
         buttons = await self._session.execute(
             select(ButtonModel)
             .where(ButtonModel.group_id == group_id)
@@ -105,3 +105,28 @@ class ButtonRepository:
         await self._session.commit()
 
         return ButtonReadSchema.model_validate(button)
+
+    async def change_button_sequence(
+            self,
+            group_id: UUID,
+            button_ids_with_seq_numbers: list[ButtonIdWithSeqNumber],
+    ) -> list[ButtonIdWithSeqNumber]:
+        id_to_seq_number = {
+            btn.button_id: btn.sequence_number
+            for btn in button_ids_with_seq_numbers
+        }
+
+        buttons = await self._session.execute(
+            select(ButtonModel)
+            .where(ButtonModel.group_id == group_id)
+        )
+        buttons = buttons.scalars().all()
+
+        for button in buttons:
+            button.sequence_number = id_to_seq_number[button.button_id]
+        await self._session.commit()
+
+        return [
+            ButtonIdWithSeqNumber.model_validate(button)
+            for button in buttons
+        ]
