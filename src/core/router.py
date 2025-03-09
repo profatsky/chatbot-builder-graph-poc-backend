@@ -1,8 +1,9 @@
 from fastapi import APIRouter
 
 from src.projects.api import router as projects_router
-from src.groups.api import router as group_router
-from src.buttons.api import router as button_router
+from src.groups.api import router as groups_router
+from src.buttons.api import router as buttons_router
+from src.inputs.api import router as inputs_router
 
 
 def get_app_router() -> APIRouter:
@@ -10,8 +11,9 @@ def get_app_router() -> APIRouter:
 
     routers = [
         projects_router,
-        group_router,
-        button_router,
+        groups_router,
+        buttons_router,
+        inputs_router,
     ]
 
     for router in routers:

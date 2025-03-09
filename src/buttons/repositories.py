@@ -12,7 +12,7 @@ class ButtonRepository:
     def __init__(self, session: AsyncSessionDI):
         self._session = session
 
-    async def create_button(self, group_id: UUID, button: ButtonCreateSchema) -> Optional[ButtonReadSchema]:
+    async def create_button(self, group_id: UUID, button: ButtonCreateSchema) -> ButtonReadSchema:
         button_count = await self._session.scalar(
             select(func.count())
             .select_from(ButtonModel)

@@ -1,8 +1,8 @@
-"""projects, groups and buttons
+"""projects, groups, buttons, inputs
 
-Revision ID: 1ffd4720ea79
+Revision ID: 701c647fab29
 Revises: 
-Create Date: 2025-02-28 14:14:25.111984
+Create Date: 2025-03-09 15:35:00.410677
 
 """
 from typing import Sequence, Union
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = '1ffd4720ea79'
+revision: str = '701c647fab29'
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -44,16 +44,19 @@ def upgrade() -> None:
     sa.Column('destination_group_id', sa.Uuid(), nullable=True),
     sa.ForeignKeyConstraint(['destination_group_id'], ['groups.group_id'], ondelete='SET NULL'),
     sa.ForeignKeyConstraint(['group_id'], ['groups.group_id'], ondelete='CASCADE'),
-    sa.PrimaryKeyConstraint('button_id')
+    sa.PrimaryKeyConstraint('button_id'),
+    sa.UniqueConstraint('group_id', 'sequence_number')
     )
     op.create_table('inputs',
     sa.Column('input_id', sa.Uuid(), server_default=sa.text('gen_random_uuid()'), nullable=False),
     sa.Column('type', sa.Enum('INT', 'EMAIL', 'PHONE_NUMBER', 'ANY', name='inputtype'), nullable=False),
+    sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
     sa.Column('group_id', sa.Uuid(), nullable=False),
     sa.Column('destination_group_id', sa.Uuid(), nullable=True),
     sa.ForeignKeyConstraint(['destination_group_id'], ['groups.group_id'], ondelete='SET NULL'),
     sa.ForeignKeyConstraint(['group_id'], ['groups.group_id'], ondelete='CASCADE'),
-    sa.PrimaryKeyConstraint('input_id')
+    sa.PrimaryKeyConstraint('input_id'),
+    sa.UniqueConstraint('group_id', 'type')
     )
     # ### end Alembic commands ###
 
@@ -64,4 +67,5 @@ def downgrade() -> None:
     op.drop_table('buttons')
     op.drop_table('groups')
     op.drop_table('projects')
+    op.execute('DROP TYPE inputtype;')
     # ### end Alembic commands ###

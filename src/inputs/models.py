@@ -1,25 +1,24 @@
 from datetime import datetime
 from uuid import UUID
 
-from sqlalchemy import DateTime, func, String, ForeignKey, UniqueConstraint
+from sqlalchemy import func, ForeignKey, Enum, DateTime, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
+from src.inputs.enums import InputType
 from src.core.db import Base
 
 
-class ButtonModel(Base):
-    __tablename__ = 'buttons'
+class InputModel(Base):
+    __tablename__ = 'inputs'
 
-    button_id: Mapped[UUID] = mapped_column(
+    input_id: Mapped[UUID] = mapped_column(
         primary_key=True,
         server_default=func.gen_random_uuid(),
     )
-
-    text: Mapped[str] = mapped_column(String(64))
-    # TODO: payload might be json
-    payload: Mapped[str] = mapped_column(String(64))
-
-    sequence_number: Mapped[int]
+    type: Mapped[InputType] = mapped_column(
+        Enum(InputType).values_callable,
+        # nullable=False,
+    )
 
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
@@ -28,8 +27,8 @@ class ButtonModel(Base):
 
     group_id: Mapped[UUID] = mapped_column(ForeignKey('groups.group_id', ondelete='CASCADE'))
     group: Mapped['GroupModel'] = relationship(
-        back_populates='buttons',
-        foreign_keys='ButtonModel.group_id',
+        back_populates='inputs',
+        foreign_keys='InputModel.group_id',
     )
 
     destination_group_id: Mapped[UUID] = mapped_column(
@@ -37,10 +36,10 @@ class ButtonModel(Base):
         nullable=True,
     )
     destination_group: Mapped['GroupModel'] = relationship(
-        back_populates='parents_buttons',
-        foreign_keys='ButtonModel.destination_group_id',
+        back_populates='parents_inputs',
+        foreign_keys='InputModel.destination_group_id',
     )
 
     __table_args__ = (
-        UniqueConstraint('group_id', 'sequence_number'),
+        UniqueConstraint('group_id', 'type'),
     )

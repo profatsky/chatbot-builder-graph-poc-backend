@@ -29,7 +29,8 @@ class GroupRepository:
         groups = await self._session.execute(
             select(GroupModel)
             .options(
-                selectinload(GroupModel.buttons)
+                selectinload(GroupModel.buttons),
+                selectinload(GroupModel.inputs),
             )
             .where(GroupModel.project_id == project_id)
             .order_by(GroupModel.created_at)

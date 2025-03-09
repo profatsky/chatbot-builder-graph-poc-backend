@@ -92,7 +92,7 @@ async def delete_button(
     except GroupNotFoundError:
         raise GroupNotFoundHTTPException
     except ButtonNotFoundError:
-        raise ButtonNotFoundError
+        raise ButtonNotFoundHTTPException
 
 
 @router.patch(
