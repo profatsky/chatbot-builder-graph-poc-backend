@@ -29,7 +29,7 @@ class ButtonService:
             self,
             project_id: UUID,
             group_id: UUID,
-            button: ButtonCreateSchema
+            button: ButtonCreateSchema,
     ) -> ButtonReadSchema:
         project = await self._project_repository.get_project_by_id(project_id)
         if project is None:
@@ -61,6 +61,7 @@ class ButtonService:
 
         return await self._button_repository.get_buttons(group_id)
 
+    # TODO: update the sequence numbers of remaining buttons after deletion
     async def delete_button(self, project_id: UUID, group_id: UUID, button_id: UUID):
         project = await self._project_repository.get_project_by_id(project_id)
         if project is None:

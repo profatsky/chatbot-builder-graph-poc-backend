@@ -4,6 +4,7 @@ from src.projects.api import router as projects_router
 from src.groups.api import router as groups_router
 from src.buttons.api import router as buttons_router
 from src.inputs.api import router as inputs_router
+from src.actions.api import router as actions_router
 
 
 def get_app_router() -> APIRouter:
@@ -14,6 +15,7 @@ def get_app_router() -> APIRouter:
         groups_router,
         buttons_router,
         inputs_router,
+        actions_router,
     ]
 
     for router in routers:

@@ -4,9 +4,7 @@ from uuid import UUID
 from sqlalchemy import DateTime, func, String, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from src.buttons.models import ButtonModel
 from src.core.db import Base
-from src.inputs.models import InputModel
 
 
 class GroupModel(Base):
@@ -25,22 +23,27 @@ class GroupModel(Base):
     project_id: Mapped[UUID] = mapped_column(ForeignKey('projects.project_id', ondelete='CASCADE'))
     project: Mapped['ProjectModel'] = relationship(back_populates='groups')
 
-    inputs: Mapped[list[InputModel]] = relationship(
+    actions: Mapped[list['ActionModel']] = relationship(
+        back_populates='group',
+        lazy='selectin',
+    )
+
+    inputs: Mapped[list['InputModel']] = relationship(
         back_populates='group',
         foreign_keys='InputModel.group_id',
         lazy='selectin',
     )
-    parents_inputs: Mapped[list[InputModel]] = relationship(
+    parents_inputs: Mapped[list['InputModel']] = relationship(
         back_populates='destination_group',
         foreign_keys='InputModel.destination_group_id',
     )
 
-    buttons: Mapped[list[ButtonModel]] = relationship(
+    buttons: Mapped[list['ButtonModel']] = relationship(
         back_populates='group',
         foreign_keys='ButtonModel.group_id',
         lazy='selectin',
     )
-    parents_buttons: Mapped[list[ButtonModel]] = relationship(
+    parents_buttons: Mapped[list['ButtonModel']] = relationship(
         back_populates='destination_group',
         foreign_keys='ButtonModel.destination_group_id',
     )

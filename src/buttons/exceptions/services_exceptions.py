@@ -1,6 +1,7 @@
 class ButtonNotFoundError(Exception):
     pass
 
+
 class IncorrectNumberOfButtonsError(Exception):
     pass
 

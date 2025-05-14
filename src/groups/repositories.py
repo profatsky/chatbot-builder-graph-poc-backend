@@ -4,6 +4,7 @@ from uuid import UUID
 from sqlalchemy import select, delete
 from sqlalchemy.orm import selectinload
 
+from src.actions.models import ActionModel
 from src.groups.models import GroupModel
 from src.groups.schemas import GroupCreateSchema, GroupReadSchema
 from src.core.dependencies.db_dependencies import AsyncSessionDI
@@ -31,6 +32,8 @@ class GroupRepository:
             .options(
                 selectinload(GroupModel.buttons),
                 selectinload(GroupModel.inputs),
+                selectinload(GroupModel.actions)
+                .selectin_polymorphic(ActionModel.__subclasses__()),
             )
             .where(GroupModel.project_id == project_id)
             .order_by(GroupModel.created_at)
@@ -44,7 +47,10 @@ class GroupRepository:
         group = await self._session.execute(
             select(GroupModel)
             .options(
-                selectinload(GroupModel.buttons)
+                selectinload(GroupModel.buttons),
+                selectinload(GroupModel.inputs),
+                selectinload(GroupModel.actions)
+                .selectin_polymorphic(ActionModel.__subclasses__()),
             )
             .where(
                 GroupModel.project_id == project_id,
