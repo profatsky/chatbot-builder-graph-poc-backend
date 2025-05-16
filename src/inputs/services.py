@@ -30,10 +30,7 @@ class InputService:
         if project is None:
             raise ProjectNotFoundError
 
-        group = await self._group_repository.get_group_by_id(
-            project_id=project_id,
-            group_id=group_id,
-        )
+        group = await self._group_repository.get_group_by_id(group_id)
         if group is None:
             raise GroupNotFoundError
 
@@ -50,10 +47,7 @@ class InputService:
         if project is None:
             raise ProjectNotFoundError
 
-        group = await self._group_repository.get_group_by_id(
-            project_id=project_id,
-            group_id=group_id,
-        )
+        group = await self._group_repository.get_group_by_id(group_id)
         if group is None:
             raise GroupNotFoundError
 
@@ -64,24 +58,15 @@ class InputService:
         if project is None:
             raise ProjectNotFoundError
 
-        group = await self._group_repository.get_group_by_id(
-            project_id=project_id,
-            group_id=group_id,
-        )
+        group = await self._group_repository.get_group_by_id(group_id)
         if group is None:
             raise GroupNotFoundError
 
-        input_field = await self._input_repository.get_input_by_id(
-            group_id=group_id,
-            input_id=input_id,
-        )
+        input_field = await self._input_repository.get_input_by_id(input_id)
         if input_field is None:
             raise InputNotFoundError
 
-        await self._input_repository.delete_input(
-            group_id=group_id,
-            input_id=input_id,
-        )
+        await self._input_repository.delete_input(input_id)
 
     async def set_input_destination_group(
             self,
@@ -94,30 +79,20 @@ class InputService:
         if project is None:
             raise ProjectNotFoundError
 
-        group = await self._group_repository.get_group_by_id(
-            project_id=project_id,
-            group_id=group_id,
-        )
+        group = await self._group_repository.get_group_by_id(group_id)
         if group is None:
             raise GroupNotFoundError
 
         # TODO: specify group id in errors
-        destination_group = await self._group_repository.get_group_by_id(
-            project_id=project_id,
-            group_id=destination_group_id,
-        )
+        destination_group = await self._group_repository.get_group_by_id(destination_group_id)
         if destination_group is None:
             raise GroupNotFoundError
 
-        button = await self._input_repository.get_input_by_id(
-            group_id=group_id,
-            input_id=input_id,
-        )
+        button = await self._input_repository.get_input_by_id(input_id)
         if button is None:
             raise InputNotFoundError
 
         return await self._input_repository.set_input_destination_group(
-            group_id=group_id,
             input_id=input_id,
             destination_group_id=destination_group_id,
         )

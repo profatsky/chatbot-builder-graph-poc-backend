@@ -41,10 +41,7 @@ class ActionService:
         if project is None:
             raise ProjectNotFoundError
 
-        group = await self._group_repository.get_group_by_id(
-            project_id=project_id,
-            group_id=group_id,
-        )
+        group = await self._group_repository.get_group_by_id(group_id)
         if group is None:
             raise GroupNotFoundError
 
@@ -58,10 +55,7 @@ class ActionService:
         if project is None:
             raise ProjectNotFoundError
 
-        group = await self._group_repository.get_group_by_id(
-            project_id=project_id,
-            group_id=group_id,
-        )
+        group = await self._group_repository.get_group_by_id(group_id)
         if group is None:
             raise GroupNotFoundError
 
@@ -72,10 +66,7 @@ class ActionService:
         if project is None:
             raise ProjectNotFoundError
 
-        group = await self._group_repository.get_group_by_id(
-            project_id=project_id,
-            group_id=group_id,
-        )
+        group = await self._group_repository.get_group_by_id(group_id)
         if group is None:
             raise GroupNotFoundError
 
@@ -97,10 +88,7 @@ class ActionService:
         if project is None:
             raise ProjectNotFoundError
 
-        group = await self._group_repository.get_group_by_id(
-            project_id=project_id,
-            group_id=group_id,
-        )
+        group = await self._group_repository.get_group_by_id(group_id)
         if group is None:
             raise GroupNotFoundError
 
@@ -126,10 +114,7 @@ class ActionService:
         if project is None:
             raise ProjectNotFoundError
 
-        group = await self._group_repository.get_group_by_id(
-            project_id=project_id,
-            group_id=group_id,
-        )
+        group = await self._group_repository.get_group_by_id(group_id)
         if group is None:
             raise GroupNotFoundError
 

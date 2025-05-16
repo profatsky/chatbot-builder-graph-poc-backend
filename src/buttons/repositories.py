@@ -12,6 +12,16 @@ class ButtonRepository:
     def __init__(self, session: AsyncSessionDI):
         self._session = session
 
+    async def _get_button_model_instance(self, button_id: UUID) -> Optional[ButtonModel]:
+        button = await self._session.execute(
+            select(ButtonModel)
+            .where(ButtonModel.button_id == button_id)
+        )
+        button = button.scalar()
+        if button is None:
+            return
+        return button
+
     async def create_button(self, group_id: UUID, button: ButtonCreateSchema) -> ButtonReadSchema:
         button_count = await self._session.scalar(
             select(func.count())
@@ -38,43 +48,25 @@ class ButtonRepository:
             for button in buttons.scalars().all()
         ]
 
-    async def get_button_by_id(self, group_id: UUID, button_id: UUID) -> Optional[ButtonReadSchema]:
-        button = await self._session.execute(
-            select(ButtonModel)
-            .where(
-                ButtonModel.group_id == group_id,
-                ButtonModel.button_id == button_id,
-            )
-        )
-        button = button.scalar()
+    async def get_button_by_id(self, button_id: UUID) -> Optional[ButtonReadSchema]:
+        button = self._get_button_model_instance(button_id)
         if button is None:
             return
         return ButtonReadSchema.model_validate(button)
 
-    async def delete_button(self, group_id: UUID, button_id: UUID):
+    async def delete_button(self, button_id: UUID):
         await self._session.execute(
             delete(ButtonModel)
-            .where(
-                ButtonModel.group_id == group_id,
-                ButtonModel.button_id == button_id,
-            )
+            .where(ButtonModel.button_id == button_id)
         )
         await self._session.commit()
 
     async def set_button_destination_group(
             self,
-            group_id: UUID,
             button_id: UUID,
             destination_group_id: UUID,
     ) -> Optional[ButtonReadSchema]:
-        button = await self._session.execute(
-            select(ButtonModel)
-            .where(
-                ButtonModel.group_id == group_id,
-                ButtonModel.button_id == button_id,
-            )
-        )
-        button = button.scalar()
+        button = self._get_button_model_instance(button_id)
         if button is None:
             return
 
@@ -85,18 +77,10 @@ class ButtonRepository:
 
     async def update_button(
             self,
-            group_id: UUID,
             button_id: UUID,
             button_update: ButtonUpdateSchema,
     ) -> Optional[ButtonReadSchema]:
-        button = await self._session.execute(
-            select(ButtonModel)
-            .where(
-                ButtonModel.group_id == group_id,
-                ButtonModel.button_id == button_id,
-            )
-        )
-        button = button.scalar()
+        button = self._get_button_model_instance(button_id)
         if button is None:
             return
 

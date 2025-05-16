@@ -12,6 +12,8 @@ from src.inputs.schemas import InputReadSchema, InputCreateSchema
 from src.projects.exceptions.http_exceptions import ProjectNotFoundHTTPException
 from src.projects.exceptions.services_exceptions import ProjectNotFoundError
 
+
+# TODO: add endpoint for update input
 router = APIRouter(
     prefix='/projects/{project_id}/groups/{group_id}/inputs',
     tags=['Inputs'],
